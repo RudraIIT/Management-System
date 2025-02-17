@@ -2,40 +2,44 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {Link} from "react-router-dom"
 import * as Icons from "lucide-react"
+import { useEffect, useState } from "react"
+import axios from "axios"
 
 interface Problem {
   id: string
-  title: string
+  name: string
   difficulty: "Easy" | "Medium" | "Hard"
   solved: boolean
-  acceptance: number
+  points: number
 }
 
-const problems: Problem[] = [
-  {
-    id: "1",
-    title: "Two Sum",
-    difficulty: "Easy",
-    solved: true,
-    acceptance: 75,
-  },
-  {
-    id: "2",
-    title: "Longest Substring Without Repeating Characters",
-    difficulty: "Medium",
-    solved: false,
-    acceptance: 45,
-  },
-  {
-    id: "3",
-    title: "Median of Two Sorted Arrays",
-    difficulty: "Hard",
-    solved: false,
-    acceptance: 25,
-  },
-]
-
 export function ProblemsPage() {
+  const [problems, setProblems] = useState<Problem[]>([])
+
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/contests/getAllProblems",{
+          withCredentials: true
+        });
+        if(response.status===200) {
+          const formattedProblems = response.data.problems.map((p: any) => ({
+            id: p._id,
+            name: p.name,
+            difficulty: p.difficulty,
+            points: p.points,
+            solved: true
+          }));
+
+          setProblems(formattedProblems)
+        }
+      } catch (error) {
+        console.error("Failed to fetch problems", error)
+      }
+    }
+
+    fetchProblems()
+  },[])
   return (
     <div className="container py-10">
       <div className="flex justify-between items-center mb-6">
@@ -50,7 +54,7 @@ export function ProblemsPage() {
             <TableHead>Status</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>Difficulty</TableHead>
-            <TableHead>Acceptance</TableHead>
+            <TableHead>Points</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -59,7 +63,7 @@ export function ProblemsPage() {
               <TableCell>{problem.solved ? <Icons.Check className="h-5 w-5 text-green-500" /> : null}</TableCell>
               <TableCell>
                 <Link to={`/problems/${problem.id}`} className="text-primary hover:underline">
-                  {problem.title}
+                  {problem.name}
                 </Link>
               </TableCell>
               <TableCell>
@@ -75,7 +79,7 @@ export function ProblemsPage() {
                   {problem.difficulty}
                 </span>
               </TableCell>
-              <TableCell>{problem.acceptance}%</TableCell>
+              <TableCell>{problem.points}%</TableCell>
             </TableRow>
           ))}
         </TableBody>

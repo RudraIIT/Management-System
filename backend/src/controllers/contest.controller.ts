@@ -75,19 +75,23 @@ export const addProblem = async(req: any,res: any) => {
     try {
         const contest = await Contest.findById(req.params.id);
         if(!contest) {
+            console.log("Contest not found");
             return res.status(404).json({
                 success: false,
                 message: "Contest not found",
             });
         }
 
-        const {name, description, difficulty, points} = req.body;
+        const {name, description, difficulty, points, examples, constraints, template} = req.body;
 
         const problem = await Problem.create({
             name,
             description,
             difficulty,
             points,
+            examples,
+            constraints,
+            template
         });
 
         contest.problems.push(problem._id);
@@ -101,5 +105,39 @@ export const addProblem = async(req: any,res: any) => {
 
     } catch (error) {
         console.log("Error in adding problem to contest",error);
+    }
+}
+
+export const getAllProblems = async(req: any, res: any) => {
+    try {
+        const problems = await Problem.find()
+
+        return res.status(200).json({
+            success: true,
+            problems,
+        })
+    } catch (error) {
+        console.log("Error in getting all problems", error);
+    }
+}
+
+export const getProblem = async(req: any, res: any) => {
+    try {
+        const { id } = req.params;
+        const problem = await Problem.findById(id);
+
+        if(!problem) {
+            return res.status(404).json({
+                success: false,
+                message: "Problem not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            problem,
+        });
+    } catch (error) {
+        console.log("Error in getting problem", error);
     }
 }

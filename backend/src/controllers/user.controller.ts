@@ -17,7 +17,7 @@ export const register = async(req: any,res: any) => {
             });
         }
 
-        sendToken(user,200,res);
+        sendToken(user,201,res);
     } catch (error) {
         console.log("Error in registering user",error);
     }
@@ -49,7 +49,7 @@ export const loginUser = async(req: any,res: any) => {
             });
         }
 
-        sendToken(user,201,res);
+        sendToken(user,200,res);
     } catch (error) {
         console.log("Error in logging in user",error);
     }

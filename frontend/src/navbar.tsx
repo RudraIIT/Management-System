@@ -5,6 +5,9 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { Code2, Trophy, FileText, Send, Menu, Users } from "lucide-react";
+import { useAuth } from "./providers/AuthContextProvider";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
 
 interface NavItem {
   title: string;
@@ -38,6 +41,19 @@ const navItems: NavItem[] = [
 export function Navbar() {
   const location = useLocation();
   const [isOpen, setIsOpen] = React.useState(false);
+  const { user, setUser } = useAuth();
+
+  useEffect(() => {
+    if(!Cookies.get("token") || !Cookies.get("user")) {
+      setUser(null)
+    }
+  },[user])
+
+  const handleLogout = () => {
+    Cookies.remove("token")
+    Cookies.remove("user")
+    setUser(null)
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -94,9 +110,15 @@ export function Navbar() {
         </Sheet>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
-            <Button variant="outline" className="mr-2" asChild>
-              <Link to="/auth">Sign In</Link>
-            </Button>
+            {user ? (
+              <Button variant="outline" className="mr-2" asChild onClick={handleLogout}>
+                <Link to="/sign-in">Sign Out</Link>
+              </Button>
+            ) : (
+              <Button variant="outline" className="mr-2" asChild>
+                <Link to="/sign-in">Sign In</Link>
+              </Button>
+            )}
           </div>
           <ModeToggle />
         </div>

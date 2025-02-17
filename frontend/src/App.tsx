@@ -1,20 +1,27 @@
 import type React from "react"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
 import { SignInForm } from "./components/sign-in"
-import AdminDashboard from "./components/AdminDashboard"
 import UserDashboard from "./components/UserDashboard"
+import { LeaderboardPage } from "./components/leaderboard"
 import { AuthProvider, useAuth } from "./providers/AuthContextProvider"
+import { SubmissionsPage } from "./components/submissions"
+import { ProblemsPage } from "./components/problems"
+import { ProblemPage } from "./components/problemsId"
 import Layout from "@/Layout"
+import { ContestsPage } from "./components/contests"
 
 function AppRoutes() {
   const { user } = useAuth()
 
   return (
-      <Routes>
-        <Route path="/sign-in" element={!user ? <SignInForm /> : <Navigate to="/" />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/user" element={<UserDashboard />} />
-      </Routes>
+    <Routes>
+      <Route path="/sign-in" element={!user ? <SignInForm /> : <Navigate to="/" />} />
+      <Route path="/submissions" element={user ? <SubmissionsPage /> : <Navigate to="/sign-in" />} />
+      <Route path="/problems" element={user ? <ProblemsPage /> : <Navigate to="/sign-in" />} />
+      <Route path="problems/:id" element={user ? <ProblemPage /> : <Navigate to="/sign-in" />} />
+      <Route path="/contests" element={user ? <ContestsPage /> : <Navigate to="/sign-in" />} />
+      <Route path="/leaderboard" element={user ? <LeaderboardPage /> : <Navigate to="/sign-in" />} />
+    </Routes>
   )
 }
 

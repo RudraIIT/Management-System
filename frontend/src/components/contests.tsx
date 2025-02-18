@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {Link} from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
 
 interface Contest {
   id: string
@@ -10,30 +12,48 @@ interface Contest {
   registered: boolean
 }
 
-const contests: Contest[] = [
-  {
-    id: "1",
-    title: "Weekly Contest 1",
-    startTime: "2024-02-20 14:00",
-    duration: "2 hours",
-    registered: true,
-  },
-  {
-    id: "2",
-    title: "Biweekly Contest 1",
-    startTime: "2024-02-24 14:00",
-    duration: "2 hours",
-    registered: false,
-  },
-]
-
 export function ContestsPage() {
+  const [contests, setContests] = useState<Contest[]>()
+  const router = useNavigate();
+  useEffect(() => {
+    const fetchContests = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/contests/getAllContest", {
+          withCredentials: true
+        });
+
+        if (response.status === 200) {
+          // console.log("response", response.data.data);
+          const fetchedContests = response.data.data.map((contest: any, index: number) => ({
+            id: contest._id?.toString() || `contest-${index}`, 
+            title: contest.name,
+            startTime: contest.startTime
+              ? new Date(contest.startTime).toISOString().replace("T", " ").substring(0, 19)
+              : null,
+            duration: (contest.startTime && contest.endTime)
+              ? (new Date(contest.endTime).getTime() - new Date(contest.startTime).getTime()) / (1000 * 3600)
+              : null,
+            registered: contest.registered ? Number(contest.registered) : 0
+          }));
+
+          // console.log(fetchedContests);
+          setContests(fetchedContests);
+        }
+
+      } catch (error) {
+        console.log(`Error in fetching contests`, error)
+      }
+    }
+
+    fetchContests()
+  }, [])
+
   return (
     <div className="container py-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Contests</h1>
         <Button asChild>
-          <Link to="/contests/create">Create Contest</Link>
+          <Link to="/create-contest">Create Contest</Link>
         </Button>
       </div>
       <Table>
@@ -46,13 +66,13 @@ export function ContestsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {contests.map((contest) => (
+          {contests?.map((contest) => (
             <TableRow key={contest.id}>
               <TableCell className="font-medium">{contest.title}</TableCell>
               <TableCell>{contest.startTime}</TableCell>
               <TableCell>{contest.duration}</TableCell>
               <TableCell>
-                <Button variant={contest.registered ? "secondary" : "default"} size="sm">
+                <Button variant={contest.registered ? "secondary" : "default"} size="sm" onClick={(e) => { router(`/contests/register/${contest.id}`)}}>
                   {contest.registered ? "Registered" : "Register"}
                 </Button>
               </TableCell>

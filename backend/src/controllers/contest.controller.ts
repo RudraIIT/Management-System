@@ -5,7 +5,6 @@ export const createContest = async(req: any,res: any) => {
     try {
         const {name, description, startTime, endTime} = req.body;
         const createdBy = req.user.id;
-        console.log(req.user);
         const contest = await Contest.create({
             name,
             description,

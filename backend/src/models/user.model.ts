@@ -3,12 +3,19 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validtor from "validator";
 
+interface IProblemProgress {
+    problem: mongoose.Schema.Types.ObjectId;
+    solved: boolean;
+    time: number;
+}
+
 interface IUser extends Document {
     username: string;
     email: string;
     password: string;
     contest: mongoose.Schema.Types.ObjectId[];
     createdContest: mongoose.Schema.Types.ObjectId[];
+    problems: IProblemProgress[];
     getJWTToken: () => string;
     comparePassword: (enteredPassword: string) => Promise<boolean>;
 }
@@ -40,6 +47,20 @@ const userSchema = new mongoose.Schema<IUser>({
     createdContest: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Contest",
+    }],
+    problems: [{
+        problem: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Problem",
+            required: true,
+        },
+        solved: {
+            type: Boolean,
+            default: false,
+        },
+        time: {
+            type: Number,
+        }
     }]
 });
 

@@ -32,7 +32,7 @@ export const createContest = async(req: any,res: any) => {
 
 export const getContest = async(req: any,res: any) => {
     try {
-        const contest = await Contest.findById(req.params.id).populate("description createdBy");
+        const contest = await Contest.findById(req.params.id).populate("description startTime endTime problems participants createdBy");
         if(!contest) {
             return res.status(404).json({
                 success: false,

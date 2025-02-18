@@ -78,6 +78,8 @@ export function ContestsPage() {
                   e.preventDefault();
                   if(!contest.registered) {
                     router(`/contests/register/${contest.id}`);
+                  } else {
+                    router(`/contests/${contest.id}`);
                   }
                 }}>
                   {contest.registered ? "Registered" : "Register"}

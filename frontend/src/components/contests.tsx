@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
+import Cookies from "js-cookie"
 
 interface Contest {
   id: string
@@ -15,6 +16,7 @@ interface Contest {
 export function ContestsPage() {
   const [contests, setContests] = useState<Contest[]>()
   const router = useNavigate();
+  const user = Cookies.get("user");
   useEffect(() => {
     const fetchContests = async () => {
       try {
@@ -33,7 +35,7 @@ export function ContestsPage() {
             duration: (contest.startTime && contest.endTime)
               ? (new Date(contest.endTime).getTime() - new Date(contest.startTime).getTime()) / (1000 * 3600)
               : null,
-            registered: contest.registered ? Number(contest.registered) : 0
+            registered: contest.participants.includes(user)
           }));
 
           // console.log(fetchedContests);
@@ -72,8 +74,18 @@ export function ContestsPage() {
               <TableCell>{contest.startTime}</TableCell>
               <TableCell>{contest.duration}</TableCell>
               <TableCell>
-                <Button variant={contest.registered ? "secondary" : "default"} size="sm" onClick={(e) => { router(`/contests/register/${contest.id}`)}}>
+                <Button variant={contest.registered ? "secondary" : "default"} size="sm" onClick={(e) => { 
+                  e.preventDefault();
+                  if(!contest.registered) {
+                    router(`/contests/register/${contest.id}`);
+                  }
+                }}>
                   {contest.registered ? "Registered" : "Register"}
+                </Button>
+              </TableCell>
+              <TableCell>
+                <Button size="sm" onClick={() => { router(`/contests/${contest.id}`) }}>
+                  Add Problems
                 </Button>
               </TableCell>
             </TableRow>

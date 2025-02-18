@@ -20,14 +20,14 @@ const contestSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Please provide an end time"],
     },
-    problems: {
-        type: [mongoose.Schema.Types.ObjectId],
+    problems: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Problem",
-    },
-    participants: {
-        type: [mongoose.Schema.Types.ObjectId],
+    }],
+    participants: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-    },
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

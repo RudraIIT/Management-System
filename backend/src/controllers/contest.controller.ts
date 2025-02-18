@@ -140,3 +140,30 @@ export const getProblem = async(req: any, res: any) => {
         console.log("Error in getting problem", error);
     }
 }
+
+export const registerContest = async(req: any, res: any) => {
+    try {
+        const { id } = req.params;
+        const contest = await Contest.findById(id);
+        const user = req.user.id;
+
+        if(!contest) {
+            return res.status(404).json({
+                success: false,
+                message: "Contest not found",
+            });
+        }
+
+        contest.participants.push(user);
+
+        await contest.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Registered successfully",
+            data: contest,
+        });
+    } catch (error) {
+        console.log("Error in registering contest", error);
+    }
+}

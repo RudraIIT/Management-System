@@ -11,6 +11,7 @@ import Layout from "@/Layout"
 import { ContestsPage } from "./components/contests"
 import { CreateContestPage } from "./components/createContest"
 import { ContestRegistrationPage } from "./components/registerContest"
+import { Toaster } from "./components/ui/toaster"
 
 function AppRoutes() {
   const { user } = useAuth()
@@ -35,6 +36,7 @@ const App: React.FC = () => {
       <Router>
         <Layout>
           <AppRoutes />
+          <Toaster />
         </Layout>
       </Router>
     </AuthProvider>

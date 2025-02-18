@@ -14,6 +14,8 @@ import {
 import { Calendar, Clock, Trophy, Users } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { useParams } from "react-router-dom"
+import axios from "axios"
+import { useToast } from "@/hooks/use-toast"
 
 interface ContestDetails {
   id: string
@@ -47,13 +49,27 @@ export function ContestRegistrationPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [isRegistering, setIsRegistering] = useState(false)
   const params = useParams()
+  const { toast } = useToast()
 
   const handleRegister = async () => {
     if (!acceptedRules) return
     setIsRegistering(true)
 
-    // Add your registration logic here
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await axios.put(`http://localhost:3000/api/contests/registerContest/${params.id}`, {}, {
+        withCredentials: true,
+      })
+
+      if( response.status === 200 ) {
+        toast({
+          title: "Registration Successful!",
+          className: "bg-blue-500 text-white",
+        })
+        setTimeout(() => router(`/contests`), 2000)
+      }
+    } catch (error) {
+      console.error("Error in registering for contest", error)
+    }
 
     setIsRegistering(false)
     setShowConfirmation(true)

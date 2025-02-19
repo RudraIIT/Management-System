@@ -86,7 +86,7 @@ export function ContestsPage() {
                 </Button>
               </TableCell>
               <TableCell>
-                <Button size="sm" onClick={() => { router(`/contests/${contest.id}`) }}>
+                <Button size="sm" onClick={() => { router(`/contests/add-problem/${contest.id}`) }}>
                   Add Problems
                 </Button>
               </TableCell>

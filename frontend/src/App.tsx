@@ -13,6 +13,7 @@ import { CreateContestPage } from "./components/createContest"
 import { ContestRegistrationPage } from "./components/registerContest"
 import { Toaster } from "./components/ui/toaster"
 import { ContestPage } from "./components/contestPage"
+import { AddProblemPage } from "./components/addProblem"
 
 function AppRoutes() {
   const { user } = useAuth()
@@ -28,6 +29,7 @@ function AppRoutes() {
       <Route path="/create-contest" element={user ? <CreateContestPage /> : <Navigate to="/sign-in" />} />
       <Route path="/contests/register/:id" element={user ? <ContestRegistrationPage /> : <Navigate to="/sign-in" />} />
       <Route path="/contests/:id" element={user ? <ContestPage /> : <Navigate to="/sign-in" />} />
+      <Route path="/contests/add-problem/:id" element={user ? <AddProblemPage /> : <Navigate to="/sign-in" />} />
     </Routes>
   )
 }

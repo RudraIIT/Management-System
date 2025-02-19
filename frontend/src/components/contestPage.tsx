@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
@@ -149,6 +149,7 @@ const calculateDuration = (start: string, end: string): string => {
 
 export function ContestPage() {
     const [contestData, setContestData] = useState<Contest | null>(null)
+    const router = useNavigate()
     // const solvedCount = contestData?.problems.filter((p) => p.solved).length
     // const totalProblems = contestData?.problems.length
     // const progress = (solvedCount / totalProblems) * 100
@@ -209,6 +210,12 @@ export function ContestPage() {
         // Parse start time
         const start = new Date(contestData.startTime);
         setStartTime(start.toISOString().replace("T", " ").substring(0, 19));
+
+        // If startTime and date not equal to current time then redirect back to contests page
+        if (start.getTime() > new Date().getTime()) {
+            router("/contests");
+            return;
+        }
 
         // Parse duration and calculate end time
         if (contestData.duration) {

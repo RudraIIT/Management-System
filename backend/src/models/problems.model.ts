@@ -48,7 +48,19 @@ const problemSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-    }]
+    }],
+    testcases :[
+        {
+            input: {
+                type: String,
+                required: true
+            },
+            output: {
+                type: String,
+                required: true
+            }
+        }
+    ]
 })
 
 const Problem = mongoose.model("Problem", problemSchema);

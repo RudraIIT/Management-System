@@ -81,7 +81,7 @@ export const addProblem = async(req: any,res: any) => {
             });
         }
 
-        const {name, description, difficulty, points, examples, constraints, template} = req.body;
+        const {name, description, difficulty, points, examples, constraints, template, testcases} = req.body;
 
         const problem = await Problem.create({
             name,
@@ -90,7 +90,8 @@ export const addProblem = async(req: any,res: any) => {
             points,
             examples,
             constraints,
-            template
+            template,
+            testcases
         });
 
         contest.problems.push(problem._id);

@@ -18,6 +18,8 @@ interface problem {
   constraints: string[]
 }
 
+const JUDGE0_URL = "http://localhost:2358"
+
 // const problemData = {
 //   id: "1",
 //   title: "Two Sum",
@@ -41,7 +43,7 @@ export function ProblemPage() {
   const [code, setCode] = useState("")
 
   const [problemStatement, setProblemStatement] = useState<problem | null>(null)
-
+  const [testCases, setTestCases] = useState<{ input: string, output: string }[]>([])
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
@@ -61,6 +63,8 @@ export function ProblemPage() {
             examples: problem.examples || [],
             constraints: problem.constraints || [],
           });
+
+          setTestCases(problem.testcases || []);
           setCode(problem.template.join("\n"));
         } else {
           console.error("Invalid problem data format:", response.data.problem);
@@ -75,7 +79,30 @@ export function ProblemPage() {
 
   const handleSubmit = async () => {
     // Add your submission logic here
-    console.log("Submitting code:", code)
+    try {
+      const response = await axios.post(
+        `${JUDGE0_URL}/submissions`,
+        {
+          source_code: btoa(unescape(encodeURIComponent(code))),
+          language_id: 54,
+          stdin: btoa(unescape(encodeURIComponent(testCases[0].input))),
+          expected_output: btoa(unescape(encodeURIComponent(testCases[0].output))),
+        },
+        {
+          params: { wait: true, base64_encoded: true },
+        }
+      );
+
+      if (response.data.status.description === "Accepted") {
+          const res = await axios.put(`http://localhost:3000/api/contests/solvedProblem/${id}`,{},{
+            withCredentials: true,
+          })
+
+          console.log("Problem solved:", res.data)
+      }
+    } catch (error) {
+      console.error("Failed to submit solution:", error)
+    }
   }
 
   return (

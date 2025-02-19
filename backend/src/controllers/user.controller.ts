@@ -66,3 +66,26 @@ export const logout = async(req: any,res: any) => {
         message: "Logged out",
     });
 }
+
+export const getProfile = async(req: any,res: any) => {
+    try {
+        const user = req.user.id;
+        // don't add problems
+        const userData = await User.findById(user).select("-problems");
+
+        if(!userData) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: userData,
+        });
+
+    } catch (error) {
+        console.log("Error in getting user profile",error);
+    }
+}

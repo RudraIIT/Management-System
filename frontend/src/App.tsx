@@ -14,6 +14,8 @@ import { ContestRegistrationPage } from "./components/registerContest"
 import { Toaster } from "./components/ui/toaster"
 import { ContestPage } from "./components/contestPage"
 import { AddProblemPage } from "./components/addProblem"
+import { ProfilePage } from "./components/profile"
+import { CertificatePage } from "./components/certificate"
 
 function AppRoutes() {
   const { user } = useAuth()
@@ -30,6 +32,8 @@ function AppRoutes() {
       <Route path="/contests/register/:id" element={user ? <ContestRegistrationPage /> : <Navigate to="/sign-in" />} />
       <Route path="/contests/:id" element={user ? <ContestPage /> : <Navigate to="/sign-in" />} />
       <Route path="/contests/add-problem/:id" element={user ? <AddProblemPage /> : <Navigate to="/sign-in" />} />
+      <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/sign-in" />} />
+      <Route path="/certificate" element={user ? <CertificatePage /> : <Navigate to="/sign-in" />} />
     </Routes>
   )
 }

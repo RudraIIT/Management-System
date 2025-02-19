@@ -31,11 +31,11 @@ const navItems: NavItem[] = [
     href: "/submissions",
     icon: <Send className="h-4 w-4" />,
   },
-  {
-    title: "Leaderboard",
-    href: "/leaderboard",
-    icon: <Users className="h-4 w-4" />,
-  },
+  // {
+  //   title: "Leaderboard",
+  //   href: "/leaderboard",
+  //   icon: <Users className="h-4 w-4" />,
+  // },
 ];
 
 export function Navbar() {

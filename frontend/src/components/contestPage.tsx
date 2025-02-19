@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
+import Cookies from "js-cookie"
 
 interface Problem {
     id: string
@@ -103,6 +104,17 @@ interface Contest {
     leaderboard: Participant[]
 }
 
+interface ContestResult {
+    contestName: string
+    participantName: string
+    rank: number
+    totalParticipants: number
+    points: number
+    problemsSolved: number
+    totalTime: string
+    date: string
+}
+
 function TimeRemaining({ endTime }: { endTime: string }) {
     const [timeLeft, setTimeLeft] = useState("")
 
@@ -150,6 +162,8 @@ const calculateDuration = (start: string, end: string): string => {
 export function ContestPage() {
     const [contestData, setContestData] = useState<Contest | null>(null)
     const router = useNavigate()
+    const user = Cookies.get("user")
+    const name = Cookies.get("name")
     // const solvedCount = contestData?.problems.filter((p) => p.solved).length
     // const totalProblems = contestData?.problems.length
     // const progress = (solvedCount / totalProblems) * 100
@@ -162,6 +176,12 @@ export function ContestPage() {
     const [totalProblems, setTotalProblems] = useState<number>(0);
     const [progress, setProgress] = useState<number>(0);
     const params = useParams<{ id: string }>();
+    const [certificateData, setCertificateData] = useState<ContestResult | null>(null);
+
+    const handleGenerateCertificate = () => {
+        console.log("Generating certificate", certificateData);
+        router("/certificate",{state: {contestResult: certificateData}});
+    }
 
     useEffect(() => {
         const fetchContest = async () => {
@@ -171,28 +191,59 @@ export function ContestPage() {
                     { withCredentials: true }
                 );
 
-                if (response.status === 200) {
+                const solvedProblems = await axios.get(`http://localhost:3000/api/contests/getSolvedProblems`, {
+                    withCredentials: true
+                });
+
+                const leaderboard = await axios.get(`http://localhost:3000/api/contests/getContestLeaderboard/${params.id}`, {
+                    withCredentials: true
+                });
+
+                console.log("solvedProblems", solvedProblems.data.data);
+
+                if (response.status === 200 && leaderboard.status === 200) {
                     console.log("response", response.data.data.problems);
                     const rawData = response.data.data;
+                    const leaderboardData = leaderboard.data.data;
+                    console.log("leaderboardData", leaderboardData);
                     const formattedContest: Contest = {
                         id: rawData._id,
                         title: rawData.name,
                         startTime: rawData.startTime,
-                        duration: calculateDuration(rawData.startTime, rawData.endTime), 
-                        endTime: rawData.endTime, 
-                        participants: Array.isArray(rawData.participants) ? rawData.participants.length : 0, 
+                        duration: calculateDuration(rawData.startTime, rawData.endTime),
+                        endTime: rawData.endTime,
+                        participants: Array.isArray(rawData.participants) ? rawData.participants.length : 0,
                         problems: rawData.problems.map((problem: any) => {
                             return {
                                 id: problem._id,
                                 title: problem.name,
                                 difficulty: problem.difficulty,
                                 points: problem.points,
-                                solved: false,
+                                solved: solvedProblems.data.data.map((p: any) => p.problem).includes(problem._id),
                                 attempted: false,
                             }
                         }),
-                        leaderboard: [], 
+                        leaderboard: leaderboardData.map((entry: any, index: number) => {
+                            return {
+                                rank: index + 1,
+                                username: entry.username,
+                                score: entry.totalPoints,
+                                solved: entry.solved,
+                                totalTime: entry.totalTime,
+                            }
+                        })
                     };
+
+                    setCertificateData({
+                        contestName: formattedContest.title,
+                        participantName: name || "",
+                        rank: leaderboardData.findIndex((entry:any) => entry.userId === user) + 1,
+                        totalParticipants: formattedContest.participants,
+                        points: formattedContest.problems.filter((p) => p.solved).reduce((acc, p) => acc + p.points, 0),
+                        problemsSolved: formattedContest.problems.filter((p) => p.solved).length,
+                        totalTime: formattedContest.duration,
+                        date: new Date().toISOString().split("T")[0],
+                    })
 
                     setContestData(formattedContest);
                 }
@@ -269,12 +320,11 @@ export function ContestPage() {
                                 </p>
                             </div>
                             <div className="space-y-2">
-                                <p className="text-sm text-muted-foreground">Your Rank</p>
-                                <p className="text-2xl font-bold">#42</p>
-                            </div>
-                            <div className="space-y-2">
                                 <p className="text-sm text-muted-foreground">Participants</p>
                                 <p className="text-2xl font-bold">{contestData?.participants}</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Button className="text-md" onClick={handleGenerateCertificate}>Generate Certificate</Button>
                             </div>
                         </div>
                     </CardContent>

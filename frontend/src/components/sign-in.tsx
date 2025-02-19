@@ -34,6 +34,7 @@ export function SignInForm() {
         setIsLoading(false)
         Cookies.set("token", response.data.token, { expires: 7 })
         Cookies.set("user", response.data.user._id, { expires: 7 })
+        Cookies.set("name", response.data.user.username, { expires: 7 })
         setUser(response.data.user._id)
         router("/")
       }
@@ -60,6 +61,7 @@ export function SignInForm() {
         setIsLoading(false)
         Cookies.set("token", response.data.token, { expires: 7 })
         Cookies.set("user", response.data.user, { expires: 7 })
+        Cookies.set("name", username, { expires: 7 })
         setUser(response.data.user)
         router("/")
       }

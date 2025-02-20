@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import Editor from '@monaco-editor/react'
 import axios from "axios"
+import { useToast } from "@/hooks/use-toast"
 
 interface problem {
   name: string,
@@ -41,6 +42,7 @@ const JUDGE0_URL = "http://localhost:2358"
 
 export function ProblemPage() {
   const [code, setCode] = useState("")
+  const { toast } = useToast()
 
   const [problemStatement, setProblemStatement] = useState<problem | null>(null)
   const [testCases, setTestCases] = useState<{ input: string, output: string }[]>([])
@@ -94,6 +96,11 @@ export function ProblemPage() {
       );
 
       if (response.data.status.description === "Accepted") {
+          toast({
+            title: "Problem solved successfully",
+            className: "bg-green-500 text-white",
+          })
+
           const res = await axios.put(`http://localhost:3000/api/contests/solvedProblem/${id}`,{},{
             withCredentials: true,
           })
